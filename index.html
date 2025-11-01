@@ -199,11 +199,16 @@
       }
       .members-grid {
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 18px 22px;
+        /* create equal circular cells and center the grid */
+        grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+        gap: 20px;
         align-items: center;
         justify-items: center;
+        justify-content: center;
         padding-top: 8px;
+        width: 100%;
+        max-width: 760px;
+        margin: 0 auto;
       }
       .member {
         display: flex;
@@ -212,8 +217,8 @@
         gap: 8px;
       }
       .avatar {
-        width: 88px;
-        height: 88px;
+        width: 110px;
+        height: 110px;
         border-radius: 50%;
         background: linear-gradient(
           135deg,
@@ -237,6 +242,31 @@
         border-radius: 6px;
         font-weight: 700;
         font-size: 0.85rem;
+      }
+      .member.placeholder { visibility: hidden; }
+      .profile-link { display: block; text-decoration: none; }
+      /* Responsive adjustments for members grid on small screens */
+      @media (max-width: 760px) {
+        .members-grid {
+          grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+          gap: 14px;
+          padding-top: 6px;
+        }
+        .avatar {
+          width: 84px;
+          height: 84px;
+        }
+        .member-name {
+          font-size: 0.9rem;
+          padding: 6px 8px;
+        }
+        .panel {
+          padding: 20px 18px;
+        }
+        .header-pill {
+          padding: 10px 20px;
+          font-size: 1rem;
+        }
       }
       /* keep other slides dark but with subtle variation */
       .slide:nth-child(3) {
@@ -334,37 +364,54 @@
           <span class="header-pill">ANGGOTA KELOMPOK</span>
         </div>
         <div class="members-grid">
+          <!-- Row 1 -->
           <div class="member">
-            <div class="avatar">H</div>
+            <a class="profile-link" href="public/havis.jpg" target="_blank" rel="noopener">
+              <div class="avatar">H</div>
+            </a>
             <div class="member-name">HAVIS</div>
           </div>
           <div class="member">
-            <div class="avatar">F</div>
+            <a class="profile-link" href="public/febri.jpg" target="_blank" rel="noopener">
+              <div class="avatar">F</div>
+            </a>
             <div class="member-name">FEBRI</div>
           </div>
           <div class="member">
-            <div class="avatar">I</div>
+            <a class="profile-link" href="public/ilham.jpg" target="_blank" rel="noopener">
+              <div class="avatar">I</div>
+            </a>
             <div class="member-name">ILHAM</div>
           </div>
+
+          <!-- Row 2: centered James using placeholders -->
+          <div class="member placeholder"></div>
           <div class="member">
-            <div class="avatar">J</div>
+            <a class="profile-link" href="public/james.jpg" target="_blank" rel="noopener">
+              <div class="avatar">J</div>
+            </a>
             <div class="member-name">JAMES</div>
           </div>
+          <div class="member placeholder"></div>
+
+          <!-- Row 3 -->
           <div class="member">
-            <div class="avatar">N</div>
+            <a class="profile-link" href="public/novi.jpg" target="_blank" rel="noopener">
+              <div class="avatar">N</div>
+            </a>
             <div class="member-name">NOVI</div>
           </div>
           <div class="member">
-            <div class="avatar">W</div>
+            <a class="profile-link" href="public/widayu.jpg" target="_blank" rel="noopener">
+              <div class="avatar">W</div>
+            </a>
             <div class="member-name">WIDAYU</div>
           </div>
           <div class="member">
-            <div class="avatar">D</div>
+            <a class="profile-link" href="public/dian.jpg" target="_blank" rel="noopener">
+              <div class="avatar">D</div>
+            </a>
             <div class="member-name">DIAN</div>
-          </div>
-          <div class="member">
-            <div class="avatar">+</div>
-            <div class="member-name">LAINNYA</div>
           </div>
         </div>
       </div>
