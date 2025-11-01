@@ -200,8 +200,8 @@
       .members-grid {
         display: grid;
         /* mobile-first: flexible auto-fit layout so small screens wrap naturally */
-        grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-        gap: 20px;
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 16px;
         align-items: center;
         justify-items: center;
         justify-content: center;
@@ -216,21 +216,24 @@
         .members-grid {
           grid-template-columns: repeat(3, 1fr);
           grid-template-rows: auto auto auto;
+          /* now a 3-3-3 visual: top 3, middle 3 (new-left, james, new-right), bottom 3 */
           grid-template-areas:
             "a b c"
-            ". d ."
+            "h d i"
             "e f g";
-          max-width: 900px;
+          max-width: 980px;
         }
 
-        /* map each member by source order into the named areas above */
+        /* map each member by source order into the named areas above (1..9) */
         .members-grid .member:nth-child(1) { grid-area: a; }
         .members-grid .member:nth-child(2) { grid-area: b; }
         .members-grid .member:nth-child(3) { grid-area: c; }
-        .members-grid .member:nth-child(4) { grid-area: d; }
-        .members-grid .member:nth-child(5) { grid-area: e; }
-        .members-grid .member:nth-child(6) { grid-area: f; }
-        .members-grid .member:nth-child(7) { grid-area: g; }
+        .members-grid .member:nth-child(4) { grid-area: h; }
+        .members-grid .member:nth-child(5) { grid-area: d; }
+        .members-grid .member:nth-child(6) { grid-area: i; }
+        .members-grid .member:nth-child(7) { grid-area: e; }
+        .members-grid .member:nth-child(8) { grid-area: f; }
+        .members-grid .member:nth-child(9) { grid-area: g; }
       }
       .member {
         display: flex;
@@ -239,8 +242,8 @@
         gap: 8px;
       }
       .avatar {
-        width: 110px;
-        height: 110px;
+        width: 96px;
+        height: 96px;
         border-radius: 50%;
         background: linear-gradient(
           135deg,
@@ -293,18 +296,20 @@
       .profile-link { display: block; text-decoration: none; }
       /* Responsive adjustments for members grid on small screens */
       @media (max-width: 760px) {
+        /* small tablets / large phones: keep a compact grid */
         .members-grid {
-          grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+          grid-template-columns: repeat(2, 1fr);
           gap: 14px;
-          padding-top: 6px;
+          padding-top: 10px;
+          max-width: 520px;
         }
         .avatar {
-          width: 84px;
-          height: 84px;
+          width: 80px;
+          height: 80px;
         }
         .member-name {
-          font-size: 0.9rem;
-          padding: 6px 8px;
+          font-size: 0.82rem;
+          padding: 5px 8px;
         }
         .panel {
           padding: 20px 18px;
@@ -312,6 +317,31 @@
         .header-pill {
           padding: 10px 20px;
           font-size: 1rem;
+        }
+      }
+      /* Very small phones: stack into a single centered column to match the phone view */
+      @media (max-width: 420px) {
+        /* Force a 3-column layout on small phones so the grid appears 3x3.
+           Avatars are reduced to keep everything fitting and readable. */
+        .members-grid {
+          grid-template-columns: repeat(3, 1fr);
+          gap: 10px;
+          padding-top: 12px;
+          max-width: 360px; /* approx 3 * avatar + gaps */
+          margin-left: auto;
+          margin-right: auto;
+        }
+        .avatar {
+          width: 64px;
+          height: 64px;
+        }
+        .member-name {
+          font-size: 0.75rem;
+          padding: 4px 6px;
+        }
+        .members-slide .panel {
+          padding-left: 10px;
+          padding-right: 10px;
         }
       }
       /* keep other slides dark but with subtle variation */
@@ -415,7 +445,7 @@
             <a class="profile-link" href="public/havis.jpeg" target="_blank" rel="noopener">
               <div class="avatar">
                 <img class="avatar-img" src="public/havis.jpeg" alt="HAVIS" onerror="this.style.display='none'" />
-                <span class="initial"></span>
+                <span class="initial">H</span>
               </div>
             </a>
             <div class="member-name">HAVIS</div>
@@ -424,7 +454,7 @@
             <a class="profile-link" href="public/febri.jpeg" target="_blank" rel="noopener">
               <div class="avatar">
                 <img class="avatar-img" src="public/febri.jpeg" alt="FEBRI" onerror="this.style.display='none'" />
-                <span class="initial"></span>
+                <span class="initial">F</span>
               </div>
             </a>
             <div class="member-name">FEBRI</div>
@@ -433,21 +463,41 @@
             <a class="profile-link" href="public/ilham.jpeg" target="_blank" rel="noopener">
               <div class="avatar">
                 <img class="avatar-img" src="public/ilham.jpeg" alt="ILHAM" onerror="this.style.display='none'" />
-                <span class="initial"></span>
+                <span class="initial">I</span>
               </div>
             </a>
             <div class="member-name">ILHAM</div>
           </div>
 
-          <!-- Row 2: James in the middle (no placeholders needed) -->
+          <!-- Row 2: added 1, James (center), added 2 -->
+          <div class="member">
+            <a class="profile-link" href="public/kiri.jpg" target="_blank" rel="noopener">
+              <div class="avatar">
+                <img class="avatar-img" src="public/kiri.jpg" alt="ADDED 1" onerror="this.style.display='none'" />
+                <span class="initial">cihuyy</span>
+              </div>
+            </a>
+            <div class="member-name">cihuyy</div>
+          </div>
+
           <div class="member">
             <a class="profile-link" href="public/james.jpeg" target="_blank" rel="noopener">
               <div class="avatar">
                 <img class="avatar-img" src="public/james.jpeg" alt="JAMES" onerror="this.style.display='none'" />
-                <span class="initial"></span>
+                <span class="initial">J</span>
               </div>
             </a>
             <div class="member-name">JAMES</div>
+          </div>
+
+          <div class="member">
+            <a class="profile-link" href="public/kanan.jpg" target="_blank" rel="noopener">
+              <div class="avatar">
+                <img class="avatar-img" src="public/kanan.jpg" alt="ADDED 2" onerror="this.style.display='none'" />
+                <span class="initial">cihuyy</span>
+              </div>
+            </a>
+            <div class="member-name">cihuyy</div>
           </div>
 
           <!-- Row 3 -->
@@ -455,7 +505,7 @@
             <a class="profile-link" href="public/novi.jpeg" target="_blank" rel="noopener">
               <div class="avatar">
                 <img class="avatar-img" src="public/novi.jpeg" alt="NOVI" onerror="this.style.display='none'" />
-                <span class="initial"></span>
+                <span class="initial">N</span>
               </div>
             </a>
             <div class="member-name">NOVI</div>
@@ -464,7 +514,7 @@
             <a class="profile-link" href="public/widayu.jpeg" target="_blank" rel="noopener">
               <div class="avatar">
                 <img class="avatar-img" src="public/widayu.jpeg" alt="WIDAYU" onerror="this.style.display='none'" />
-                <span class="initial"></span>
+                <span class="initial">W</span>
               </div>
             </a>
             <div class="member-name">WIDAYU</div>
@@ -473,7 +523,7 @@
             <a class="profile-link" href="public/dian.jpeg" target="_blank" rel="noopener">
               <div class="avatar">
                 <img class="avatar-img" src="public/dian.jpeg" alt="DIAN" onerror="this.style.display='none'" />
-                <span class="initial"></span>
+                <span class="initial">D</span>
               </div>
             </a>
             <div class="member-name">DIAN</div>
