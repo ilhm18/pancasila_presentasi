@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Presentasi</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        margin: 0;
+        font-family: "Segoe UI", sans-serif;
+        background: #111;
+        color: #fff;
+        overflow: hidden;
+      }
+      .slide {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 3em;
+        text-align: center;
+        padding: 20px;
+        opacity: 0;
+        transition: opacity 1s, transform 1s;
+        transform: scale(0.8);
+      }
+      .slide.active {
+        opacity: 1;
+        transform: scale(1);
+      }
+      .controls {
+        /* container spans full width and sits near the bottom; buttons will be bottom-left and bottom-right */
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 20px;
+        pointer-events: none; /* allow only the buttons to receive pointer events */
+      }
+      .controls button {
+        /* transparent style: no solid fill, light border for contrast */
+        background: transparent;
+        border: 2px solid rgba(255, 64, 129, 0.18);
+        color: #fff;
+        padding: 10px 18px;
+        font-size: 1.2em;
+        cursor: pointer;
+        border-radius: 6px;
+        transition: background 0.18s ease, border-color 0.18s ease,
+          transform 0.12s ease;
+        position: absolute; /* position individually */
+        bottom: 0; /* place at bottom of the fixed container */
+        transform: none;
+        pointer-events: auto; /* re-enable for the buttons themselves */
+        -webkit-backdrop-filter: blur(4px);
+        backdrop-filter: blur(4px);
+      }
+      /* place prev on the left and next on the right */
+      .controls #prev {
+        left: 18px;
+      }
+      .controls #next {
+        right: 18px;
+      }
+      .controls button:hover {
+        /* subtle tinted background on hover to indicate interactivity */
+        background: rgba(255, 64, 129, 0.08);
+        border-color: rgba(255, 64, 129, 0.36);
+        transform: scale(1.02);
+      }
+      .controls button:focus {
+        outline: none;
+        box-shadow: 0 0 0 6px rgba(255, 64, 129, 0.08);
+        border-color: rgba(255, 64, 129, 0.5);
+      }
+      /* page indicator (top-left small pill) */
+      .page-indicator {
+        position: fixed;
+        top: 18px;
+        left: 18px;
+        background: rgba(0, 0, 0, 0.45);
+        color: #fff;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: 0.95rem;
+        pointer-events: none;
+        z-index: 1200;
+      }
+      /* Dark aesthetic slide styles
+         - .cover-slide : presentation cover with rounded panel and subtle grid pattern
+         - .members-slide : members grid inside a rounded panel
+         - other slides keep deep gradient backgrounds */
+      .cover-slide {
+        background: linear-gradient(180deg, #0b1020 0%, #0f1522 60%);
+        color: #e9f0ff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      /* panel that resembles the sample: light grid on dark rounded rectangle */
+      .cover-slide .panel {
+        width: min(1000px, 86%);
+        max-width: 1100px;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.03),
+          rgba(255, 255, 255, 0.01)
+        );
+        border-radius: 18px;
+        padding: 48px 36px;
+        box-shadow: 0 8px 30px rgba(2, 6, 23, 0.6);
+        position: relative;
+        overflow: hidden;
+      }
+      /* subtle grid overlay inside panel */
+      .cover-slide .panel::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: linear-gradient(
+            rgba(255, 255, 255, 0.02) 1px,
+            transparent 1px
+          ),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+        background-size: 36px 36px, 36px 36px;
+        opacity: 0.6;
+        pointer-events: none;
+      }
+      .cover-slide .panel .title-box {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 60%;
+        margin: 0 auto;
+        background: rgba(11, 16, 32, 0.88);
+        color: #fff;
+        border-radius: 12px;
+        padding: 28px 20px;
+        font-size: 2.6rem;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+      }
+      .cover-slide .panel .subtitle {
+        text-align: center;
+        margin-top: 14px;
+        color: var(--muted);
+        font-weight: 700;
+      }
+
+      .members-slide {
+        background: linear-gradient(180deg, #0b1118 0%, #0f1822 70%);
+        color: #e6eef6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .members-slide .panel {
+        width: min(1000px, 86%);
+        max-width: 1100px;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.03),
+          rgba(255, 255, 255, 0.01)
+        );
+        border-radius: 18px;
+        padding: 28px 28px 36px 28px;
+        box-shadow: 0 8px 30px rgba(2, 6, 23, 0.6);
+        position: relative;
+        overflow: hidden;
+      }
+      .members-slide .panel::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: linear-gradient(
+            rgba(255, 255, 255, 0.02) 1px,
+            transparent 1px
+          ),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+        background-size: 36px 36px, 36px 36px;
+        opacity: 0.55;
+        pointer-events: none;
+      }
+      .members-slide .panel .header-pill {
+        display: inline-block;
+        background: rgba(11, 16, 32, 0.9);
+        color: #fff;
+        padding: 12px 28px;
+        border-radius: 999px;
+        font-weight: 800;
+        margin: 6px 0 18px 0;
+        box-shadow: 0 6px 18px rgba(2, 6, 23, 0.3);
+      }
+      .members-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 18px 22px;
+        align-items: center;
+        justify-items: center;
+        padding-top: 8px;
+      }
+      .member {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+      }
+      .avatar {
+        width: 88px;
+        height: 88px;
+        border-radius: 50%;
+        background: linear-gradient(
+          135deg,
+          rgba(124, 92, 255, 0.12),
+          rgba(58, 215, 255, 0.06)
+        );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        color: #fff;
+        box-shadow: 0 6px 18px rgba(2, 6, 23, 0.4) inset,
+          0 6px 18px rgba(2, 6, 23, 0.2);
+        border: 2px solid rgba(255, 255, 255, 0.04);
+      }
+      .member-name {
+        margin-top: 6px;
+        background: rgba(11, 16, 32, 0.9);
+        color: var(--muted);
+        padding: 6px 10px;
+        border-radius: 6px;
+        font-weight: 700;
+        font-size: 0.85rem;
+      }
+      /* keep other slides dark but with subtle variation */
+      .slide:nth-child(3) {
+        background: radial-gradient(
+            900px 350px at 50% 10%,
+            rgba(124, 92, 255, 0.06),
+            transparent 8%
+          ),
+          linear-gradient(135deg, #0a0f1a 10%, #121422 60%, #191b2a 100%);
+        color: #f0eefe;
+      }
+      .slide:nth-child(4) {
+        background: radial-gradient(
+            1000px 450px at 20% 80%,
+            rgba(0, 198, 255, 0.05),
+            transparent 8%
+          ),
+          linear-gradient(135deg, #07111a 10%, #0b1622 60%, #0f1b2a 100%);
+        color: #e6f7ff;
+      }
+      /* content panel used by multiple content slides */
+      .content-slide {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(180deg, #0b1118 0%, #0f1622 70%);
+        color: #eaf2ff;
+      }
+      .content-slide .panel {
+        width: min(1000px, 86%);
+        max-width: 1100px;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.03),
+          rgba(255, 255, 255, 0.01)
+        );
+        border-radius: 18px;
+        padding: 28px 36px;
+        box-shadow: 0 8px 30px rgba(2, 6, 23, 0.6);
+        position: relative;
+        overflow: hidden;
+      }
+      .content-slide .panel::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: linear-gradient(
+            rgba(255, 255, 255, 0.02) 1px,
+            transparent 1px
+          ),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+        background-size: 36px 36px, 36px 36px;
+        opacity: 0.55;
+        pointer-events: none;
+      }
+      .content-slide .header-pill {
+        display: inline-block;
+        background: rgba(11, 16, 32, 0.9);
+        color: #fff;
+        padding: 10px 26px;
+        border-radius: 999px;
+        font-weight: 800;
+        margin: 6px 0 18px 0;
+        box-shadow: 0 6px 18px rgba(2, 6, 23, 0.3);
+        font-size: 1.05rem;
+      }
+      .panel-body {
+        text-align: left;
+        color: #e6eef6;
+        line-height: 1.6;
+        font-size: 0.95rem;
+        margin-top: 10px;
+      }
+      .term-title {
+        font-weight: 800;
+        color: #0b1020;
+        display: inline-block;
+        background: rgba(255, 255, 255, 0.92);
+        padding: 6px 10px;
+        border-radius: 6px;
+        margin-right: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="slide cover-slide active">
+      <div class="panel">
+        <div class="title-box">PRESENTASI PANCASILA</div>
+        <div class="subtitle">Oleh : Kelompok 2</div>
+      </div>
+    </div>
+    <div class="slide members-slide">
+      <div class="panel">
+        <div style="text-align: center">
+          <span class="header-pill">ANGGOTA KELOMPOK</span>
+        </div>
+        <div class="members-grid">
+          <div class="member">
+            <div class="avatar">H</div>
+            <div class="member-name">HAVIS</div>
+          </div>
+          <div class="member">
+            <div class="avatar">F</div>
+            <div class="member-name">FEBRI</div>
+          </div>
+          <div class="member">
+            <div class="avatar">I</div>
+            <div class="member-name">ILHAM</div>
+          </div>
+          <div class="member">
+            <div class="avatar">J</div>
+            <div class="member-name">JAMES</div>
+          </div>
+          <div class="member">
+            <div class="avatar">N</div>
+            <div class="member-name">NOVI</div>
+          </div>
+          <div class="member">
+            <div class="avatar">W</div>
+            <div class="member-name">WIDAYU</div>
+          </div>
+          <div class="member">
+            <div class="avatar">D</div>
+            <div class="member-name">DIAN</div>
+          </div>
+          <div class="member">
+            <div class="avatar">+</div>
+            <div class="member-name">LAINNYA</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="slide content-slide">
+      <div class="panel">
+        <div style="text-align: center">
+          <span class="header-pill">DEFINISI</span>
+        </div>
+        <div class="panel-body">
+          <p>
+            <span class="term-title">Radikalisme</span>adalah paham atau
+            ideologi yang menginginkan perubahan besar secara drastis terhadap
+            sistem sosial, politik, atau agama yang ada, sering kali dengan cara
+            yang ekstrem dan tidak kompromistis.
+          </p>
+          <p style="margin-top: 12px">
+            <span class="term-title">Terorisme</span>adalah tindakan kekerasan
+            yang dilakukan secara sengaja untuk menimbulkan ketakutan dalam
+            masyarakat, biasanya dengan tujuan politik, ideologis, atau
+            religius.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide content-slide">
+      <div class="panel">
+        <div style="text-align: center">
+          <span class="header-pill">JENIS-JENIS</span>
+        </div>
+        <div class="panel-body">
+          <p>
+            <strong>Radikalisme Politik</strong><br />Definisi: Menginginkan
+            perubahan sistem pemerintahan secara drastis dan merubah cara kerja
+            dan sistem demokrasi.<br />Contoh: Ancaman yang dilakukan suatu
+            kelompok secara ekstrim dengan tujuan mengganti pemerintahan yang
+            ada.
+          </p>
+          <p style="margin-top: 10px">
+            <strong>Radikalisme Agama</strong><br />Definisi: Menghayati dan
+            mengamalkan suatu keyakinan secara kaku dengan menghilangkan
+            keragaman dan sikap toleransi.<br />Contoh: Kelompok yang menganggap
+            diri paling ortodoks dan membantah eksistensi agama lain serta
+            menggunakan kekerasan atas nama agama.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide content-slide">
+      <div class="panel">
+        <div style="text-align: center">
+          <span class="header-pill">JENIS-JENIS</span>
+        </div>
+        <div class="panel-body">
+          <p>
+            <strong>Radikalisme Sosial</strong><br />Definisi: Menginginkan
+            perubahan dalam sistem sosial dengan menghilangkan ketidakadilan
+            ekstrim.<br />Contoh: Pergerakan yang bersifat kekerasan dalam
+            menentang sistem kasta atau diskriminasi.
+          </p>
+          <p style="margin-top: 10px">
+            <strong>Radikalisme Ekonomi</strong><br />Definisi: Menginginkan
+            perubahan besar dalam sistem ekonomi dan merubah sistem
+            kapitalisme.<br />Contoh: Mengubah cara hidup dengan perjuangan
+            membela suatu sistem komunis dan merubah sistem yang ada.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide content-slide">
+      <div class="panel">
+        <div style="text-align: center">
+          <span class="header-pill">JENIS-JENIS</span>
+        </div>
+        <div class="panel-body">
+          <p>
+            <strong>Terorisme Politik</strong><br />Definisi: Terorisme yang
+            bertujuan untuk menggulingkan atau memiliki pengaruh pada suatu
+            negara.<br />Contoh: Serangan yang dilakukan suatu kelompok
+            pemberontak pada gedung pemerintahan atau pejabat negara.
+          </p>
+          <p style="margin-top: 10px">
+            <strong>Terorisme Agama</strong><br />Definisi: Terorisme yang
+            dilakukan dengan keyakinan yang bersifat fundamentalis.<br />Contoh:
+            Penyerangan atau aksi kekerasan atas nama agama oleh kelompok
+            ekstrem seperti Al-Qaeda.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide content-slide">
+      <div class="panel">
+        <div style="text-align: center">
+          <span class="header-pill">JENIS-JENIS</span>
+        </div>
+        <div class="panel-body">
+          <p>
+            <strong>Terorisme Ideologis</strong><br />Definisi: Terorisme yang
+            timbul dari penganut suatu ideologi tertentu baik yang ekstrem kanan
+            maupun kiri.<br />Contoh: Serangan yang dilakukan oleh kelompok
+            neo-nazi atau kelompok yang terlampau kanan atau kiri.
+          </p>
+          <p style="margin-top: 10px">
+            <strong>Terorisme Nasionalis atau Separatis</strong
+            ><br />Penjelasan: Terorisme yang ditujukan dalam rangka melepaskan
+            diri dari suatu negara tertentu atau perjuangan untuk mendapatkan
+            kemerdekaan pada suatu wilayah.<br />Contoh: Tindakan kekerasan yang
+            dilakukan oleh kelompok separatis untuk memisahkan wilayah seperti
+            ETA.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide content-slide">
+      <div class="panel">
+        <div style="text-align: center">
+          <span class="header-pill">INDIKATOR RADIKALISME</span>
+        </div>
+        <div class="panel-body">
+          <p>
+            Indikator radikalisme adalah ciri-ciri atau tanda-tanda yang
+            menunjukkan adanya pemikiran, sikap, atau perilaku ekstrem dan
+            keras, terutama dalam hal agama, politik, atau ideologi. Indikator
+            ini membantu mengenali seseorang atau kelompok yang tidak toleran
+            terhadap perbedaan, ingin mengubah sistem secara drastis, dan kadang
+            menggunakan kekerasan untuk mencapai tujuannya.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide content-slide">
+      <div class="panel">
+        <div style="text-align: center">
+          <span class="header-pill">INDIKATOR TERORISME</span>
+        </div>
+        <div class="panel-body">
+          <p>
+            Indikator terorisme adalah tanda atau gejala yang menunjukkan
+            kemungkinan terjadinya terorisme. Indikator ini bisa berupa tanda
+            fisik, tindakan, atau terkait dunia maya, dan berguna untuk
+            mengenali potensi aksi teroris sejak awal agar dapat dicegah.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide content-slide">
+      <div class="panel">
+        <div style="text-align: center">
+          <span class="header-pill">FAKTOR PEMICU</span>
+        </div>
+        <div class="panel-body">
+          <p>
+            Faktor pemicu radikalisme dan terorisme sangat kompleks dan saling
+            berkaitan, baik dari aspek individu, sosial, ekonomi, politik,
+            maupun ideologi. Beberapa faktor umum meliputi:
+          </p>
+          <ul>
+            <li>
+              <strong>Faktor Ideologi:</strong> Pemahaman agama atau ideologi
+              yang ekstrem dan radikal, indoktrinasi oleh kelompok tertentu.
+            </li>
+            <li>
+              <strong>Faktor Sosial dan Politik:</strong> Diskriminasi, konflik
+              sosial, pemerintahan korup, ketidakpercayaan terhadap otoritas.
+            </li>
+            <li>
+              <strong>Faktor Ekonomi:</strong> Kemiskinan, pengangguran,
+              ketimpangan, kurangnya akses pendidikan dan pekerjaan.
+            </li>
+            <li>
+              <strong>Faktor Psikologis:</strong> Krisis identitas, frustrasi,
+              rasa kecewa pribadi.
+            </li>
+            <li>
+              <strong>Faktor Media dan Teknologi:</strong> Penyebaran propaganda
+              melalui media sosial, situs propaganda, dan forum daring.
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide content-slide">
+      <div class="panel">
+        <div style="text-align: center">
+          <span class="header-pill">FAKTOR PENGARUH</span>
+        </div>
+        <div class="panel-body">
+          <p>
+            Radikalisme dan terorisme bisa tumbuh karena berbagai pengaruh, baik
+            dari dalam diri seseorang maupun dari lingkungan sekitarnya.
+            Beberapa faktor utama:
+          </p>
+          <ol>
+            <li>
+              <strong>Faktor Individu (Pribadi):</strong> Krisis identitas:
+              seseorang merasa bingung dengan tujuan hidupnya dan mudah
+              dipengaruhi.
+            </li>
+            <li>
+              <strong>Faktor Pendidikan:</strong> Kurangnya pendidikan yang
+              seimbang dan moderat, terutama yang mengajarkan toleransi.
+            </li>
+            <li>
+              <strong>Faktor Ekonomi:</strong> Kemiskinan dan pengangguran dapat
+              membuat seseorang frustrasi dan merasa tidak punya harapan.
+            </li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide content-slide">
+      <div class="panel">
+        <div style="text-align: center">
+          <span class="header-pill">FAKTOR PENGARUH</span>
+        </div>
+        <div class="panel-body">
+          <ol start="4">
+            <li>
+              <strong>Faktor Sosial dan Lingkungan:</strong> Lingkungan
+              tertutup, tidak toleran, dan penuh tekanan sosial mendorong arah
+              ekstrem.
+            </li>
+            <li>
+              <strong>Faktor Politik:</strong> Ketidakpuasan terhadap
+              pemerintahan atau aparat yang dianggap tidak adil atau menindas.
+            </li>
+            <li>
+              <strong>Faktor Teknologi dan Media Sosial:</strong> Internet dan
+              media sosial menjadi alat utama penyebaran paham radikal.
+            </li>
+            <li>
+              <strong>Faktor Agama (yang Disalahpahami):</strong> Agama
+              dijadikan pembenaran untuk kekerasan melalui tafsiran keliru.
+            </li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide content-slide">
+      <div class="panel">
+        <div style="text-align: center">
+          <span class="header-pill">SIKAP DAN PERILAKU RADIKAL</span>
+        </div>
+        <div class="panel-body">
+          <p>
+            Sikap dan perilaku radikal mengacu pada perspektif atau tindakan
+            yang berusaha mengubah aspek sosial atau politik secara drastis dan
+            cepat, seringkali dengan cara ekstrem atau melanggar kebiasaan.
+            Penting untuk mengenali dan menangani sikap serta perilaku ini
+            secara tepat.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide content-slide">
+      <div class="panel">
+        <div style="text-align: center">
+          <span class="header-pill">CONTOH DAN SIKAP PERILAKU RADIKAL</span>
+        </div>
+        <div class="panel-body">
+          <p><strong>Contoh Sikap Radikal:</strong></p>
+          <ul>
+            <li>Menganggap diri atau kelompoknya paling benar</li>
+            <li>Fanatik berlebihan terhadap ide atau keyakinan</li>
+            <li>Menolak perbedaan pendapat, budaya, atau agama</li>
+            <li>Berprasangka buruk terhadap pihak berbeda</li>
+          </ul>
+          <p style="margin-top: 8px">
+            <strong>Contoh Perilaku Radikal:</strong>
+          </p>
+          <ul>
+            <li>Menyebarkan kebencian dan provokasi</li>
+            <li>Memaksa orang lain mengikuti keyakinannya</li>
+            <li>Menggunakan kekerasan untuk mencapai tujuan</li>
+            <li>Menolak aturan yang berlaku di masyarakat atau negara</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Inserted slide: RADIKALISASI (added per user request) -->
+    <div class="slide content-slide">
+      <div class="panel">
+        <div style="text-align: center">
+          <span class="header-pill">RADIKALISASI</span>
+        </div>
+        <div class="panel-body">
+          <p>
+            Radikalisasi adalah proses perubahan cara berpikir seseorang atau
+            kelompok yang awalnya bersikap biasa saja lalu perlahan berubah
+            menjadi berpikir, bersikap, dan bertindak menjadi lebih ekstrem,
+            intoleran, serta tidak mau menerima perbedaan, bahkan bisa sampai
+            menggunakan cara-cara keras atau kekerasan untuk mencapai tujuan.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slides: Strategi dan Antisipasi (ditambahkan) -->
+    <div class="slide content-slide">
+      <div class="panel">
+        <div style="text-align: center">
+          <span class="header-pill">STRATEGI DAN ANTISIPASI</span>
+        </div>
+        <div class="panel-body">
+          <p>
+            Strategi untuk menghadapi bahaya radikalisme dan terorisme mencakup
+            pembelajaran dan pengajian agar masyarakat lebih paham ilmu yang
+            benar, meningkatkan rasa nasionalisme, serta memperkuat kemampuan
+            masyarakat untuk mencegah dan menghadapi pengaruh negatif. Program
+            pengurangan pengaruh radikal dan pengawasan penyebaran ide-ide
+            berbahaya di media sosial dan lingkungan belajar sangat penting.
+            Peran keluarga, sekolah, dan komunitas sangat menentukan dalam
+            melindungi generasi muda.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide content-slide">
+      <div class="panel">
+        <div style="text-align: center">
+          <span class="header-pill">STRATEGI DAN ANTISIPASI</span>
+        </div>
+        <div class="panel-body">
+          <p>
+            <strong
+              >Strategi dan Antisipasi Bahaya Radikalisme dan Terorisme</strong
+            >
+          </p>
+          <ul>
+            <li>
+              Mengubah batasan budaya dan bagaimana masyarakat mendapatkan serta
+              menggunakan informasi untuk mengurangi pemikiran radikal.
+            </li>
+            <li>
+              Membantu kaum muda memahami terorisme dan radikalisme melalui
+              pendidikan yang spesifik dan akurat.
+            </li>
+            <li>
+              Mengurangi kesenjangan sosial yang menjadi lahan subur paham
+              ekstrem.
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide content-slide">
+      <div class="panel">
+        <div style="text-align: center">
+          <span class="header-pill">STRATEGI DAN ANTISIPASI</span>
+        </div>
+        <div class="panel-body">
+          <ul>
+            <li>
+              Pemerintah perlu memperbaiki citra dan membangun kontrak sosial
+              dengan masyarakat untuk mencegah narasi ketidakadilan sosial.
+            </li>
+            <li>
+              Pemerintah perlu membangun program yang meminimalkan narasi
+              ketidakadilan dan memberikan akses pendidikan serta ekonomi yang
+              merata.
+            </li>
+            <li>
+              Perkuat nilai-nilai Pancasila dan slogan kebangsaan sebagai dasar
+              kehidupan bersama dalam keberagaman.
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- slides inserted after slide 18 (KUNCI / KESIMPULAN / QUIZ / TERIMA KASIH) -->
+
+    <div class="slide content-slide">
+      <div class="panel">
+        <div style="text-align: center">
+          <span class="header-pill">KUNCI UTAMA<br />ANTI KONFLIK</span>
+        </div>
+        <div class="panel-body">
+          <p>
+            Kunci utama untuk mencegah dan mengatasi bahaya radikalisme serta
+            terorisme adalah dengan memberikan pendidikan dan pemahaman yang
+            benar, serta memperkuat nilai-nilai kebangsaan dan toleransi.
+          </p>
+          <ul>
+            <li>Pendidikan dan Pemahaman yang Benar</li>
+            <li>
+              Memberikan pendidikan yang menyeluruh mengenai agama, kebangsaan,
+              dan nilai-nilai kemanusiaan secara seimbang dan moderat.
+            </li>
+            <li>
+              Meningkatkan kemampuan membaca informasi media serta berpikir
+              kritis agar masyarakat tidak mudah terpengaruh oleh informasi
+              radikal atau berita palsu.
+            </li>
+            <li>Penguatan Nilai Kebangsaan dan Toleransi</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide content-slide">
+      <div class="panel">
+        <div style="text-align: center">
+          <span class="header-pill">KESIMPULAN</span>
+        </div>
+        <div class="panel-body">
+          <p>
+            Radikalisme dan terorisme sering muncul dari rasa tidak puas
+            terhadap kondisi sosial, ketidakadilan, dan penyebaran pemikiran
+            yang salah atau ekstrem.
+          </p>
+          <p>
+            Untuk menghadapi dan mencegah radikalisme serta terorisme diperlukan
+            pendekatan menyeluruh: pendidikan yang benar dan tidak memihak,
+            penguatan nilai kebangsaan dan toleransi, serta peran aktif
+            masyarakat dan pemerintah.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide content-slide">
+      <div class="panel">
+        <div style="text-align: center">
+          <span class="header-pill">SESI QUIZ</span>
+        </div>
+        <div
+          class="panel-body"
+          style="display: flex; align-items: center; justify-content: center"
+        >
+          <div
+            style="
+              background: rgba(11, 16, 32, 0.9);
+              color: #fff;
+              padding: 28px 22px;
+              border-radius: 12px;
+              max-width: 420px;
+              text-align: center;
+            "
+          >
+            <p style="font-weight: 800; font-size: 1.1rem; margin: 0 0 8px 0">
+              Silahkan buka <p style="font-weight: 800; font-size: 1.1rem; margin: 0 0 8px 0">kahoot di google</p>
+            </p>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide content-slide">
+      <div class="panel">
+        <div style="text-align: center">
+        </div>
+        <div
+          class="panel-body"
+          style="display: flex; align-items: center; justify-content: center"
+        >
+          <div
+            style="
+              background: rgba(11, 16, 32, 0.9);
+              color: #fff;
+              padding: 28px 40px;
+              border-radius: 12px;
+              max-width: 360px;
+              text-align: center;
+              font-family: 'Great Vibes', cursive;
+              font-weight: 400;
+              font-size: 4.8rem;
+              line-height: 0.95;
+            "
+          >
+            Terima<br />Kasih
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="pageIndicator" class="page-indicator" aria-hidden="true">
+      1 dari 1
+    </div>
+
+    <div class="controls">
+      <button id="prev">⏮</button>
+      <button id="next">⏭</button>
+    </div>
+
+    <script>
+      const slides = document.querySelectorAll(".slide");
+      let currentSlide = 0;
+
+      const pageIndicator = document.getElementById("pageIndicator");
+      function updateIndicator() {
+        if (!pageIndicator) return;
+        pageIndicator.textContent = `${currentSlide + 1} dari ${slides.length}`;
+      }
+      // set initial indicator
+      updateIndicator();
+
+      document.getElementById("next").addEventListener("click", () => {
+        slides[currentSlide].classList.remove("active");
+        currentSlide = (currentSlide + 1) % slides.length;
+        slides[currentSlide].classList.add("active");
+        updateIndicator();
+      });
+
+      document.getElementById("prev").addEventListener("click", () => {
+        slides[currentSlide].classList.remove("active");
+        currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+        slides[currentSlide].classList.add("active");
+        updateIndicator();
+      });
+
+      // Navigasi dengan keyboard
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowRight") {
+          document.getElementById("next").click();
+        } else if (e.key === "ArrowLeft") {
+          document.getElementById("prev").click();
+        }
+      });
+    </script>
+  </body>
+</html>
