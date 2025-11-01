@@ -199,7 +199,7 @@
       }
       .members-grid {
         display: grid;
-        /* create equal circular cells and center the grid */
+        /* mobile-first: flexible auto-fit layout so small screens wrap naturally */
         grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
         gap: 20px;
         align-items: center;
@@ -209,6 +209,28 @@
         width: 100%;
         max-width: 760px;
         margin: 0 auto;
+      }
+
+      /* Desktop: force a 3-1-3 visual layout and place James in the middle row/column */
+      @media (min-width: 761px) {
+        .members-grid {
+          grid-template-columns: repeat(3, 1fr);
+          grid-template-rows: auto auto auto;
+          grid-template-areas:
+            "a b c"
+            ". d ."
+            "e f g";
+          max-width: 900px;
+        }
+
+        /* map each member by source order into the named areas above */
+        .members-grid .member:nth-child(1) { grid-area: a; }
+        .members-grid .member:nth-child(2) { grid-area: b; }
+        .members-grid .member:nth-child(3) { grid-area: c; }
+        .members-grid .member:nth-child(4) { grid-area: d; }
+        .members-grid .member:nth-child(5) { grid-area: e; }
+        .members-grid .member:nth-child(6) { grid-area: f; }
+        .members-grid .member:nth-child(7) { grid-area: g; }
       }
       .member {
         display: flex;
@@ -384,15 +406,13 @@
             <div class="member-name">ILHAM</div>
           </div>
 
-          <!-- Row 2: centered James using placeholders -->
-          <div class="member placeholder"></div>
+          <!-- Row 2: James in the middle (no placeholders needed) -->
           <div class="member">
             <a class="profile-link" href="public/james.jpeg" target="_blank" rel="noopener">
               <div class="avatar">J</div>
             </a>
             <div class="member-name">JAMES</div>
           </div>
-          <div class="member placeholder"></div>
 
           <!-- Row 3 -->
           <div class="member">
